@@ -2,7 +2,8 @@
 
 ## Podstawowe informacje
 
-Prosty program służący do pobierania kursów walut z serwerów Narodowego Banku Polskiego i wyświetlania podstawowych statystyk dla kursu kupna i sprzedaży w okreslonym przedziale czasowym.
+Prosty program służący do pobierania kursów walut z serwerów Narodowego Banku Polskiego w formie XML i wyświetlania podstawowych statystyk dla kursu kupna i sprzedaży w okreslonym przedziale czasowym.
+
 
 ## Wyświetlane dane
 
