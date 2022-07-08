@@ -11,6 +11,10 @@ namespace lab_nbp_xml
     public class CurrencyXML
     {
         private string[] availableCurrs = { "USD", "EUR", "CHF", "GBP" };
+
+        public readonly List<float> valuesPurchase = new List<float>();
+        public readonly List<float> valuesSale = new List<float>();
+        public readonly List<DateTime> dataDates = new List<DateTime>();
         public CurrencyXML(string curr, DateTime from, DateTime to)
         {
             curr = curr.ToUpper();
@@ -20,11 +24,77 @@ namespace lab_nbp_xml
                 throw new ArgumentOutOfRangeException();
             }
 
-            getDataFromNBP(curr, from);
-
-
+            List<string> dataFiles = new List<string>();
             List<DateTime?> range = getRange(from, to);
+            foreach(DateTime dt in range)
+            {
+                List<string> getList = getListXML(dt);
+                dataFiles = dataFiles.Concat(getList).ToList();
+                if (getList.Count != 0)
+                {
+                    dataDates.Add(dt);
+                }
+            }
 
+            getDataFromNBP(dataFiles, curr);
+        }
+
+        public string getMax(string s)
+        {
+            switch (s)
+            {
+                case "sale":
+                    return "MAX " + valuesSale.Max() + " in " + dataDates[valuesSale.IndexOf(valuesSale.Max())].ToString("dd.MM.yyyy");
+                case "purchase":
+                    return "MAX " + valuesPurchase.Max() + " in " + dataDates[valuesPurchase.IndexOf(valuesPurchase.Max())].ToString("dd.MM.yyyy");
+            }
+            return "ERROR";
+        }
+
+        public string getMin(string s)
+        {
+            switch (s)
+            {
+                case "sale":
+                    return "MIN " + valuesSale.Min() + " in " + dataDates[valuesSale.IndexOf(valuesSale.Min())].ToString("dd.MM.yyyy");
+                case "purchase":
+                    return "MIN " + valuesPurchase.Min() + " in " + dataDates[valuesPurchase.IndexOf(valuesPurchase.Min())].ToString("dd.MM.yyyy");
+            }
+            return "ERROR";
+        }
+
+        public string getAvg(string s)
+        {
+            switch (s)
+            {
+                case "sale":
+                    return "AVG: " + valuesSale.Average();
+                case "purchase":
+                    return "AVG: " + valuesPurchase.Average();
+            }
+            return "ERROR";
+        }
+
+        public string getDeviation(string s)
+        {
+            double result = 0;
+            double avg = 0;
+            double sum = 0;
+
+            switch (s)
+            {
+                case "sale":
+                    avg = valuesSale.Average();
+                    sum = valuesSale.Sum(d => Math.Pow(d - avg, 2));
+                    result = Math.Sqrt((sum) / valuesSale.Count());
+                    break;
+                case "purchase":
+                    avg = valuesSale.Average();
+                    sum = valuesSale.Sum(d => Math.Pow(d - avg, 2));
+                    result = Math.Sqrt((sum) / valuesSale.Count());
+                    break;
+            }
+            return "DEVIATION: " + result;
         }
 
         private List<DateTime?> getRange(DateTime from, DateTime to)
@@ -58,10 +128,10 @@ namespace lab_nbp_xml
             return result;
         }
 
-        public static void getDataFromNBP(string curr, DateTime date)
+        private void getDataFromNBP(List<string> dataFiles, string curr)
         {
-            List<string> dataFiles = getListXML(date);
-            foreach(string dF in dataFiles)
+
+            foreach (string dF in dataFiles)
             {
                 WebClient client = new WebClient();
                 Stream stream = client.OpenRead("https://www.nbp.pl/kursy/xml/" + dF +".xml");
@@ -71,14 +141,12 @@ namespace lab_nbp_xml
                 doc.Declaration = new XDeclaration("1.0", "utf-8", null);
 
                 var result = doc.Descendants("kod_waluty")
-                        .Where(el => el.Value == "EUR")
+                        .Where(el => el.Value == curr)
                         .First()
                         .Parent;
 
-                var result2 = result.Element("nazwa_waluty").Value;
-
-                Console.WriteLine(result2);
-                Console.WriteLine("");
+                valuesPurchase.Add(float.Parse(result.Element("kurs_kupna").Value));
+                valuesSale.Add(float.Parse(result.Element("kurs_sprzedazy").Value));
             }
 
         }

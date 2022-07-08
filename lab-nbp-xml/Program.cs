@@ -11,30 +11,32 @@ namespace lab_nbp_xml
             DateTime t = new DateTime(2022, 07, 06);
             var x = new CurrencyXML("eur", f, t);
 
-            /* DateTime from = DateTime.Parse(Console.ReadLine());
-            DateTime to = DateTime.Parse(Console.ReadLine());
-
-            var dates = Enumerable
-                .Range(0, int.MaxValue)
-                .Select(index => new DateTime?(from.AddDays(index)))
-                .TakeWhile(date => date <= to)
-                .ToList();
-
-            foreach (DateTime d in dates)
+            Console.WriteLine("Purchase");
+            foreach(var c in x.valuesPurchase)
             {
-                Console.WriteLine(d.Day);
-            } */
-
-            /* try
+                Console.WriteLine(c.ToString());
+            }Console.WriteLine("Sale");
+            foreach(var c in x.valuesSale)
             {
-                Start();
+                Console.WriteLine(c.ToString());
             }
-            catch
+
+            Console.WriteLine("Dates");
+            foreach(var c in x.dataDates)
             {
-                Console.WriteLine("błąd");
-            } */
+                Console.WriteLine(c.ToString());
+            }
+            Console.WriteLine("------Purchase-----");
+            Console.WriteLine(x.getMax("purchase"));
+            Console.WriteLine(x.getMin("purchase"));
+            Console.WriteLine(x.getAvg("purchase"));
+            Console.WriteLine(x.getDeviation("purchase"));
 
-
+            Console.WriteLine("-----Sale------");
+            Console.WriteLine(x.getMax("sale"));
+            Console.WriteLine(x.getMin("sale"));
+            Console.WriteLine(x.getAvg("sale"));
+            Console.WriteLine(x.getDeviation("sale"));
 
         }
     }
