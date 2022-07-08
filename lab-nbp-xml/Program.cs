@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 
 namespace lab_nbp_xml
 {
@@ -7,36 +6,40 @@ namespace lab_nbp_xml
     {
         static void Main(string[] args)
         {
-            DateTime f = new DateTime(2022, 07, 01);
-            DateTime t = new DateTime(2022, 07, 06);
-            var x = new CurrencyXML("eur", f, t);
+            try
+            {
+                string[] startArguments = args;
+                string currency = startArguments[0];
+                DateTime from = DateTime.Parse(startArguments[1]);
+                DateTime to = DateTime.Parse(startArguments[2]);
+                Console.WriteLine("Retrieving data... Please wait");
+                var XMLdata = new CurrencyXML(currency, from, to);
+                Console.WriteLine("");
 
-            Console.WriteLine("Purchase");
-            foreach(var c in x.valuesPurchase)
-            {
-                Console.WriteLine(c.ToString());
-            }Console.WriteLine("Sale");
-            foreach(var c in x.valuesSale)
-            {
-                Console.WriteLine(c.ToString());
+                Console.WriteLine(currency + " currency data");
+
+                Console.WriteLine("");
+                Console.WriteLine("------PURCHASE-----");
+                Console.WriteLine("MAX: " + XMLdata.getMax("purchase"));
+                Console.WriteLine("MIN: " + XMLdata.getMin("purchase"));
+                Console.WriteLine("AVG: " + XMLdata.getAvg("purchase"));
+                Console.WriteLine("DEVIATION: " + XMLdata.getDeviation("purchase"));
+
+                Console.WriteLine("");
+
+                Console.WriteLine("--------SALE-------");
+                Console.WriteLine("MAX: " + XMLdata.getMax("sale"));
+                Console.WriteLine("MIN: " + XMLdata.getMin("sale"));
+                Console.WriteLine("AVG: " + XMLdata.getAvg("sale"));
+                Console.WriteLine("DEVIATION: " + XMLdata.getDeviation("sale"));
             }
-
-            Console.WriteLine("Dates");
-            foreach(var c in x.dataDates)
+            catch(Exception ex)
             {
-                Console.WriteLine(c.ToString());
+                Console.WriteLine("--------ERROR------");
+                Console.WriteLine(ex);
+                Console.WriteLine("--------ERROR------");
             }
-            Console.WriteLine("------Purchase-----");
-            Console.WriteLine(x.getMax("purchase"));
-            Console.WriteLine(x.getMin("purchase"));
-            Console.WriteLine(x.getAvg("purchase"));
-            Console.WriteLine(x.getDeviation("purchase"));
-
-            Console.WriteLine("-----Sale------");
-            Console.WriteLine(x.getMax("sale"));
-            Console.WriteLine(x.getMin("sale"));
-            Console.WriteLine(x.getAvg("sale"));
-            Console.WriteLine(x.getDeviation("sale"));
+            
 
         }
     }

@@ -12,13 +12,12 @@ namespace lab_nbp_xml
     {
         private string[] availableCurrs = { "USD", "EUR", "CHF", "GBP" };
 
-        public readonly List<float> valuesPurchase = new List<float>();
-        public readonly List<float> valuesSale = new List<float>();
-        public readonly List<DateTime> dataDates = new List<DateTime>();
+        private List<float> valuesPurchase = new List<float>();
+        private List<float> valuesSale = new List<float>();
+        private List<DateTime> dataDates = new List<DateTime>();
+
         public CurrencyXML(string curr, DateTime from, DateTime to)
         {
-            curr = curr.ToUpper();
-
             if (!availableCurrs.Contains(curr))
             {
                 throw new ArgumentOutOfRangeException();
@@ -41,60 +40,79 @@ namespace lab_nbp_xml
 
         public string getMax(string s)
         {
+            float result = 0;
+            string date = null;
+
             switch (s)
             {
                 case "sale":
-                    return "MAX " + valuesSale.Max() + " in " + dataDates[valuesSale.IndexOf(valuesSale.Max())].ToString("dd.MM.yyyy");
+                    result = valuesSale.Max();
+                    date = dataDates[valuesSale.IndexOf(valuesSale.Max())].ToString("dd.MM.yyyy");
+                    break;
                 case "purchase":
-                    return "MAX " + valuesPurchase.Max() + " in " + dataDates[valuesPurchase.IndexOf(valuesPurchase.Max())].ToString("dd.MM.yyyy");
+                    result = valuesPurchase.Max();
+                    date = dataDates[valuesPurchase.IndexOf(valuesPurchase.Max())].ToString("dd.MM.yyyy");
+                    break;
             }
-            return "ERROR";
+            return result + " (" + date + ")";
         }
 
         public string getMin(string s)
         {
+            float result = 0;
+            string date = null;
+
             switch (s)
             {
                 case "sale":
-                    return "MIN " + valuesSale.Min() + " in " + dataDates[valuesSale.IndexOf(valuesSale.Min())].ToString("dd.MM.yyyy");
+                    result = valuesSale.Min();
+                    date = dataDates[valuesSale.IndexOf(valuesSale.Min())].ToString("dd.MM.yyyy");
+                    break;
                 case "purchase":
-                    return "MIN " + valuesPurchase.Min() + " in " + dataDates[valuesPurchase.IndexOf(valuesPurchase.Min())].ToString("dd.MM.yyyy");
+                    result = valuesPurchase.Min();
+                    date = dataDates[valuesPurchase.IndexOf(valuesPurchase.Min())].ToString("dd.MM.yyyy");
+                    break;
             }
-            return "ERROR";
+            return result + " (" + date + ")";
         }
 
         public string getAvg(string s)
         {
+            float result = 0;
+
             switch (s)
             {
                 case "sale":
-                    return "AVG: " + valuesSale.Average();
+                    result = valuesSale.Average();
+                    break;
                 case "purchase":
-                    return "AVG: " + valuesPurchase.Average();
+                    result = valuesPurchase.Average();
+                    break;
             }
-            return "ERROR";
+            return result.ToString();
         }
 
         public string getDeviation(string s)
         {
             double result = 0;
-            double avg = 0;
-            double sum = 0;
 
             switch (s)
             {
                 case "sale":
-                    avg = valuesSale.Average();
-                    sum = valuesSale.Sum(d => Math.Pow(d - avg, 2));
-                    result = Math.Sqrt((sum) / valuesSale.Count());
+                    result = calcDeviation(valuesSale);
                     break;
                 case "purchase":
-                    avg = valuesSale.Average();
-                    sum = valuesSale.Sum(d => Math.Pow(d - avg, 2));
-                    result = Math.Sqrt((sum) / valuesSale.Count());
+                    result = calcDeviation(valuesPurchase);
                     break;
             }
-            return "DEVIATION: " + result;
+            return result.ToString();
+        }
+
+        private double calcDeviation(List<float> f)
+        {
+            double avg = f.Average();
+            double sum = f.Sum(d => Math.Pow(d - avg, 2));
+            return Math.Sqrt((sum) / f.Count());
         }
 
         private List<DateTime?> getRange(DateTime from, DateTime to)
@@ -108,7 +126,7 @@ namespace lab_nbp_xml
 
         private static List<string> getListXML(DateTime date)
         {
-            string listFilesYear = (date.ToString("yy") == DateTime.Today.ToString("yy")) ? "" : date.ToString("yy");
+            string listFilesYear = (date.ToString("yyyy") == DateTime.Today.ToString("yyyy")) ? "" : date.ToString("yyyy");
 
             WebClient listClient = new WebClient();
             Stream listStream = listClient.OpenRead("https://www.nbp.pl/kursy/xml/dir" + listFilesYear + ".txt");
